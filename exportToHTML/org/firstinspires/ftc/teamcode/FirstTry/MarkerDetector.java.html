@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>MarkerDetector.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MarkerDetector.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.Telemetry</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Core</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Mat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Point</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Rect</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Scalar</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.imgproc.Imgproc</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvPipeline</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">MarkerDetector </span><span class="s0">extends </span><span class="s1">OpenCvPipeline {</span>
+    <span class="s0">public final </span><span class="s1">Scalar BLUE = </span><span class="s0">new </span><span class="s1">Scalar(</span><span class="s2">0.0D</span><span class="s0">, </span><span class="s2">0.0D</span><span class="s0">, </span><span class="s2">255.0D</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s0">public final </span><span class="s1">Scalar GREEN = </span><span class="s0">new </span><span class="s1">Scalar(</span><span class="s2">0.0D</span><span class="s0">, </span><span class="s2">255.0D</span><span class="s0">, </span><span class="s2">0.0D</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s0">static final </span><span class="s1">Point REGION1_TOPLEFT_ANCHOR_POINT = </span><span class="s0">new </span><span class="s1">Point(</span><span class="s2">85.0D</span><span class="s0">, </span><span class="s2">80.0D</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s0">static final </span><span class="s1">Point REGION2_TOPLEFT_ANCHOR_POINT = </span><span class="s0">new </span><span class="s1">Point(</span><span class="s2">310.0D</span><span class="s0">, </span><span class="s2">80.0D</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s0">static final </span><span class="s1">Point REGION3_TOPLEFT_ANCHOR_POINT = </span><span class="s0">new </span><span class="s1">Point(</span><span class="s2">555.0D</span><span class="s0">, </span><span class="s2">80.0D</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">REGION_WIDTH = </span><span class="s2">30</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">REGION_HEIGHT = </span><span class="s2">40</span><span class="s0">;</span>
+    <span class="s1">Point region1_pointA</span><span class="s0">;</span>
+    <span class="s1">Point region1_pointB</span><span class="s0">;</span>
+    <span class="s1">Point region2_pointA</span><span class="s0">;</span>
+    <span class="s1">Point region2_pointB</span><span class="s0">;</span>
+    <span class="s1">Point region3_pointA</span><span class="s0">;</span>
+    <span class="s1">Point region3_pointB</span><span class="s0">;</span>
+    <span class="s1">Mat region1_Cr</span><span class="s0">;</span>
+    <span class="s1">Mat region2_Cr</span><span class="s0">;</span>
+    <span class="s1">Mat region3_Cr</span><span class="s0">;</span>
+    <span class="s1">Mat YCrCb</span><span class="s0">;</span>
+    <span class="s1">Mat Cr</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">avg1</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">avg2</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">avg3</span><span class="s0">;</span>
+    <span class="s0">public volatile </span><span class="s1">MarkerDetector.CappingPosition position</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">Telemetry telemetry</span><span class="s0">;</span>
+
+    <span class="s0">public </span><span class="s1">MarkerDetector(Telemetry telemetry) {</span>
+        <span class="s0">this</span><span class="s1">.region1_pointA = </span><span class="s0">new </span><span class="s1">Point(REGION1_TOPLEFT_ANCHOR_POINT.x</span><span class="s0">, </span><span class="s1">REGION1_TOPLEFT_ANCHOR_POINT.y)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region1_pointB = </span><span class="s0">new </span><span class="s1">Point(REGION1_TOPLEFT_ANCHOR_POINT.x + </span><span class="s2">30.0D</span><span class="s0">, </span><span class="s1">REGION1_TOPLEFT_ANCHOR_POINT.y + </span><span class="s2">40.0D</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region2_pointA = </span><span class="s0">new </span><span class="s1">Point(REGION2_TOPLEFT_ANCHOR_POINT.x</span><span class="s0">, </span><span class="s1">REGION2_TOPLEFT_ANCHOR_POINT.y)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region2_pointB = </span><span class="s0">new </span><span class="s1">Point(REGION2_TOPLEFT_ANCHOR_POINT.x + </span><span class="s2">30.0D</span><span class="s0">, </span><span class="s1">REGION2_TOPLEFT_ANCHOR_POINT.y + </span><span class="s2">40.0D</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region3_pointA = </span><span class="s0">new </span><span class="s1">Point(REGION3_TOPLEFT_ANCHOR_POINT.x</span><span class="s0">, </span><span class="s1">REGION3_TOPLEFT_ANCHOR_POINT.y)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region3_pointB = </span><span class="s0">new </span><span class="s1">Point(REGION3_TOPLEFT_ANCHOR_POINT.x + </span><span class="s2">30.0D</span><span class="s0">, </span><span class="s1">REGION3_TOPLEFT_ANCHOR_POINT.y + </span><span class="s2">40.0D</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.YCrCb = </span><span class="s0">new </span><span class="s1">Mat()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.Cr = </span><span class="s0">new </span><span class="s1">Mat()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.position = MarkerDetector.CappingPosition.LEFT</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.telemetry = telemetry</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">void </span><span class="s1">inputToCr(Mat input) {</span>
+        <span class="s1">Imgproc.cvtColor(input</span><span class="s0">, this</span><span class="s1">.YCrCb</span><span class="s0">, </span><span class="s2">37</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Core.extractChannel(</span><span class="s0">this</span><span class="s1">.YCrCb</span><span class="s0">, this</span><span class="s1">.Cr</span><span class="s0">, </span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">init(Mat firstFrame) {</span>
+        <span class="s0">this</span><span class="s1">.inputToCr(firstFrame)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region1_Cr = </span><span class="s0">this</span><span class="s1">.Cr.submat(</span><span class="s0">new </span><span class="s1">Rect(</span><span class="s0">this</span><span class="s1">.region1_pointA</span><span class="s0">, this</span><span class="s1">.region1_pointB))</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region2_Cr = </span><span class="s0">this</span><span class="s1">.Cr.submat(</span><span class="s0">new </span><span class="s1">Rect(</span><span class="s0">this</span><span class="s1">.region2_pointA</span><span class="s0">, this</span><span class="s1">.region2_pointB))</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.region3_Cr = </span><span class="s0">this</span><span class="s1">.Cr.submat(</span><span class="s0">new </span><span class="s1">Rect(</span><span class="s0">this</span><span class="s1">.region3_pointA</span><span class="s0">, this</span><span class="s1">.region3_pointB))</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">Mat processFrame(Mat input) {</span>
+        <span class="s0">this</span><span class="s1">.inputToCr(input)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.avg1 = (</span><span class="s0">int</span><span class="s1">)Core.mean(</span><span class="s0">this</span><span class="s1">.region1_Cr).val[</span><span class="s2">0</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.avg2 = (</span><span class="s0">int</span><span class="s1">)Core.mean(</span><span class="s0">this</span><span class="s1">.region2_Cr).val[</span><span class="s2">0</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.avg3 = (</span><span class="s0">int</span><span class="s1">)Core.mean(</span><span class="s0">this</span><span class="s1">.region3_Cr).val[</span><span class="s2">0</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region1_pointA</span><span class="s0">, this</span><span class="s1">.region1_pointB</span><span class="s0">, this</span><span class="s1">.BLUE</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region2_pointA</span><span class="s0">, this</span><span class="s1">.region2_pointB</span><span class="s0">, this</span><span class="s1">.BLUE</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region3_pointA</span><span class="s0">, this</span><span class="s1">.region3_pointB</span><span class="s0">, this</span><span class="s1">.BLUE</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">maxOneTwo = Math.max(</span><span class="s0">this</span><span class="s1">.avg1</span><span class="s0">, this</span><span class="s1">.avg2)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">max = Math.max(maxOneTwo</span><span class="s0">, this</span><span class="s1">.avg3)</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(max == </span><span class="s0">this</span><span class="s1">.avg1) {</span>
+            <span class="s0">this</span><span class="s1">.position = MarkerDetector.CappingPosition.LEFT</span><span class="s0">;</span>
+            <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region1_pointA</span><span class="s0">, this</span><span class="s1">.region1_pointB</span><span class="s0">, this</span><span class="s1">.GREEN</span><span class="s0">, </span><span class="s1">-</span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else if </span><span class="s1">(max == </span><span class="s0">this</span><span class="s1">.avg2) {</span>
+            <span class="s0">this</span><span class="s1">.position = MarkerDetector.CappingPosition.CENTER</span><span class="s0">;</span>
+            <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region2_pointA</span><span class="s0">, this</span><span class="s1">.region2_pointB</span><span class="s0">, this</span><span class="s1">.GREEN</span><span class="s0">, </span><span class="s1">-</span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else if </span><span class="s1">(max == </span><span class="s0">this</span><span class="s1">.avg3) {</span>
+            <span class="s0">this</span><span class="s1">.position = MarkerDetector.CappingPosition.RIGHT</span><span class="s0">;</span>
+            <span class="s1">Imgproc.rectangle(input</span><span class="s0">, this</span><span class="s1">.region3_pointA</span><span class="s0">, this</span><span class="s1">.region3_pointB</span><span class="s0">, this</span><span class="s1">.GREEN</span><span class="s0">, </span><span class="s1">-</span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">this</span><span class="s1">.telemetry.addData(</span><span class="s3">&quot;[Pattern]&quot;</span><span class="s0">, this</span><span class="s1">.position)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.telemetry.addData(</span><span class="s3">&quot;Left: &quot;</span><span class="s0">, this</span><span class="s1">.avg1)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.telemetry.addData(</span><span class="s3">&quot;Middle: &quot;</span><span class="s0">, this</span><span class="s1">.avg2)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.telemetry.addData(</span><span class="s3">&quot;Right: &quot;</span><span class="s0">, this</span><span class="s1">.avg3)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.telemetry.update()</span><span class="s0">;</span>
+        <span class="s0">return </span><span class="s1">input</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">MarkerDetector.CappingPosition getAnalysis() {</span>
+        <span class="s0">return this</span><span class="s1">.position</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static enum </span><span class="s1">CappingPosition {</span>
+        <span class="s1">LEFT</span><span class="s0">,</span>
+        <span class="s1">CENTER</span><span class="s0">,</span>
+        <span class="s1">RIGHT</span><span class="s0">;</span>
+
+        <span class="s0">private </span><span class="s1">CappingPosition() {</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

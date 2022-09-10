@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Measurement.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Measurement.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s0">;</span>
+
+<span class="s1">@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = </span><span class="s2">&quot;measuring code&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">Measurement </span><span class="s0">extends </span><span class="s1">LinearOpMode{</span>
+    <span class="s1">AutoHardwareBOXNOWRIST robot = </span><span class="s0">new </span><span class="s1">AutoHardwareBOXNOWRIST()</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode() </span><span class="s0">throws </span><span class="s1">InterruptedException {</span>
+        <span class="s1">robot.init(hardwareMap)</span><span class="s0">;</span>
+
+        <span class="s3">//undo init() setting all motors to brake</span>
+        <span class="s1">robot.arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+        <span class="s1">robot.extender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+        <span class="s1">robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+        <span class="s1">robot.frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+        <span class="s1">robot.backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+        <span class="s1">robot.backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT)</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Status&quot;</span><span class="s0">, </span><span class="s2">&quot;Initialized&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s1">waitForStart()</span><span class="s0">;</span>
+        <span class="s0">while</span><span class="s1">(opModeIsActive()){</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;FR wheel position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.frontRight.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;FL wheel position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.frontLeft.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;BR wheel position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.backRight.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;BL wheel position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.backLeft.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;arm position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.arm.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;extender position&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.extender.getCurrentPosition()))</span><span class="s0">;</span>
+            <span class="s3">//telemetry.addData(&quot;servo 1 position&quot;, Double.toString(robot.grab1.getPosition()));</span>
+            <span class="s3">//telemetry.addData(&quot;Wrist position&quot;, Double.toString(robot.wrist.getPosition()));</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;angle:&quot;</span><span class="s0">, </span><span class="s1">Double.toString(robot.getAngle()))</span><span class="s0">;</span>
+            <span class="s3">//telemetry.addData(&quot;flipper&quot;, Double.toString(robot.flipper.getPosition()));</span>
+            <span class="s1">telemetry.update()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

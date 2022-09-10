@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>FirstOpMode.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+FirstOpMode.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.OpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.TeleOp</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.Servo</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.Range</span><span class="s0">;</span>
+
+<span class="s1">@TeleOp(name = </span><span class="s2">&quot;FirstOpMode&quot;</span><span class="s0">, </span><span class="s1">group = </span><span class="s2">&quot;FirstTry&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">FirstOpMode </span><span class="s0">extends </span><span class="s1">OpMode {</span>
+
+    <span class="s1">DcMotor FrontLeft</span><span class="s0">, </span><span class="s1">BackLeft</span><span class="s0">;</span>
+    <span class="s1">DcMotor FrontRight</span><span class="s0">, </span><span class="s1">BackRight</span><span class="s0">;</span>
+    <span class="s1">DcMotor Arm</span><span class="s0">, </span><span class="s1">Carousel</span><span class="s0">;</span>
+    <span class="s1">Servo Grab</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">init(){</span>
+        <span class="s1">FrontLeft = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;FrontLeft&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">BackLeft = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;BackLeft&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">FrontRight = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;FrontRight&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">BackRight = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;BackRight&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Arm = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;Arm&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Carousel = hardwareMap.get(DcMotor.</span><span class="s0">class,</span><span class="s2">&quot;Carousel&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Grab = hardwareMap.get(Servo.</span><span class="s0">class, </span><span class="s2">&quot;Grab&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">loop(){</span>
+
+        <span class="s1">FrontLeft.setPower(Range.clip(gamepad1.left_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">1</span><span class="s0">, </span><span class="s3">1</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">BackLeft.setPower(Range.clip(gamepad1.left_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">1</span><span class="s0">, </span><span class="s3">1</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">FrontRight.setPower(Range.clip(gamepad1.right_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">1</span><span class="s0">, </span><span class="s3">1</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">BackRight.setPower(Range.clip(gamepad1.right_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">1</span><span class="s0">, </span><span class="s3">1</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">Arm.setPower(Range.clip(gamepad2.right_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">.4</span><span class="s0">, </span><span class="s3">.4</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">Carousel.setPower(Range.clip(gamepad2.left_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s3">.5</span><span class="s0">, </span><span class="s3">.5</span><span class="s1">))</span><span class="s0">;</span>
+
+        <span class="s0">if</span><span class="s1">(gamepad2.right_bumper){</span>
+            <span class="s1">Grab.setPosition(</span><span class="s3">.4</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if</span><span class="s1">(gamepad2.left_bumper){</span>
+            <span class="s1">Grab.setPosition(</span><span class="s3">0</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

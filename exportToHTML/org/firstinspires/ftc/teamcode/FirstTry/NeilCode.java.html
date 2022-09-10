@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>NeilCode.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #808080;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+NeilCode.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.OpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.TeleOp</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.HardwareMap</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.Servo</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.Range</span><span class="s0">;</span>
+
+<span class="s1">@TeleOp(name = </span><span class="s2">&quot;Neil Opmode&quot;</span><span class="s0">, </span><span class="s1">group = </span><span class="s2">&quot;TeleOp&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">NeilCode </span><span class="s0">extends </span><span class="s1">LinearOpMode{</span>
+
+    <span class="s3">//initialize opmode members</span>
+    <span class="s1">NeilHardware robot = </span><span class="s0">new </span><span class="s1">NeilHardware()</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">ElapsedTime runtime = </span><span class="s0">new </span><span class="s1">ElapsedTime()</span><span class="s0">;</span>
+
+    <span class="s3">//initialize</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode(){</span>
+        <span class="s1">robot.init(hardwareMap)</span><span class="s0">;</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Status&quot;</span><span class="s0">, </span><span class="s2">&quot;Initialized&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s3">/* 
+        telemetry.addData(&quot;Mode&quot;, &quot;calibrating...&quot;); 
+        telemetry.update(); 
+ 
+        // make sure the imu gyro is calibrated before continuing. 
+        while (!isStopRequested() &amp;&amp; !robot.imu.isGyroCalibrated()) 
+        { 
+            sleep(50); 
+            idle(); 
+        } 
+        */</span>
+
+        <span class="s1">waitForStart()</span><span class="s0">;</span>
+        <span class="s1">runtime.reset()</span><span class="s0">;</span>
+
+        <span class="s3">//variables for controlling</span>
+        <span class="s0">double </span><span class="s1">forwardleft</span><span class="s0">, </span><span class="s1">forwardright</span><span class="s0">, </span><span class="s1">strafeleft</span><span class="s0">, </span><span class="s1">straferight</span><span class="s0">, </span><span class="s1">armMove</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">correction = </span><span class="s4">0</span><span class="s0">; </span><span class="s3">//dunno abt this one, maybe useful for autonomoosssss</span>
+        <span class="s0">double </span><span class="s1">armSpeed = </span><span class="s4">0.4</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">carouselSpeed = </span><span class="s4">0.5</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">grabPos = </span><span class="s4">0.4</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">openPos = </span><span class="s4">0.15</span><span class="s0">;</span>
+
+        <span class="s0">int </span><span class="s1">armlevel = </span><span class="s4">0</span><span class="s0">;</span>
+
+        <span class="s0">double </span><span class="s1">sens = </span><span class="s4">0.3</span><span class="s0">;</span>
+
+        <span class="s3">//tick values for the arm postion for levels of the team wobble</span>
+
+
+        <span class="s3">//control loop</span>
+        <span class="s0">while</span><span class="s1">(opModeIsActive()){</span>
+
+            <span class="s3">//incredibly scuffed, but it works. the sticks don't correspond to the right variables, but it works</span>
+            <span class="s1">forwardleft = Range.clip(gamepad1.left_stick_x</span><span class="s0">,</span><span class="s1">-</span><span class="s4">1</span><span class="s0">,</span><span class="s4">1</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">strafeleft = Range.clip(gamepad1.left_stick_y</span><span class="s0">,</span><span class="s1">-</span><span class="s4">1</span><span class="s0">,</span><span class="s4">1</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">forwardright = Range.clip(gamepad1.right_stick_x</span><span class="s0">,</span><span class="s1">-</span><span class="s4">1</span><span class="s0">,</span><span class="s4">1</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">straferight = Range.clip(gamepad1.right_stick_y</span><span class="s0">, </span><span class="s1">-</span><span class="s4">1</span><span class="s0">, </span><span class="s4">1</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s3">//armMove = Range.clip(gamepad2.left_stick_y,-1,1);</span>
+
+            <span class="s3">//move wheels</span>
+            <span class="s0">if</span><span class="s1">(Math.abs(forwardleft) &gt; sens || Math.abs(forwardright) &gt; sens || Math.abs(strafeleft) &gt; sens || Math.abs(straferight) &gt; sens){</span>
+                <span class="s1">robot.setDriveSpeeds(forwardleft</span><span class="s0">, </span><span class="s1">forwardright</span><span class="s0">, </span><span class="s1">strafeleft</span><span class="s0">, </span><span class="s1">straferight</span><span class="s0">, </span><span class="s1">correction)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s0">else</span><span class="s1">{</span>
+                <span class="s1">robot.stop()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s3">/*move arm 
+            if(Math.abs(armMove) &gt; sens){ 
+                robot.moveArm(armMove * armSpeed); 
+            } 
+            else{ 
+                robot.moveArm(0); 
+            } 
+            */</span>
+
+            <span class="s3">//control grabber</span>
+            <span class="s3">//if(gamepad2.left_bumper){</span>
+            <span class="s3">//  robot.grab(grabPos);</span>
+            <span class="s3">//}</span>
+            <span class="s3">//else if(gamepad2.right_bumper) {</span>
+            <span class="s3">//   robot.grab(openPos);</span>
+            <span class="s3">//}</span>
+            <span class="s3">//use y button for top level directly</span>
+            <span class="s0">if</span><span class="s1">(gamepad1.y)</span>
+            <span class="s1">{</span>
+                <span class="s1">armlevel = </span><span class="s4">1</span><span class="s0">;</span>
+                <span class="s1">robot.ArmPosition(armlevel</span><span class="s0">, </span><span class="s4">0.2</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s3">//use a button for top level directly</span>
+            <span class="s0">if</span><span class="s1">(gamepad1.a)</span>
+            <span class="s1">{</span>
+                <span class="s1">armlevel = </span><span class="s4">0</span><span class="s0">;</span>
+                <span class="s1">robot.ArmPosition(armlevel</span><span class="s0">, </span><span class="s4">0.2</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>

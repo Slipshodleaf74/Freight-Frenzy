@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>FreightFrenzyPipeline.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+FreightFrenzyPipeline.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.Telemetry</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Core</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Mat</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Rect</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.core.Scalar</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.opencv.imgproc.Imgproc</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvPipeline</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.util.ArrayList</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">FreightFrenzyPipeline </span><span class="s0">extends </span><span class="s1">OpenCvPipeline{</span>
+
+    <span class="s1">Mat YCrCb = </span><span class="s0">new </span><span class="s1">Mat()</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">position</span><span class="s0">;</span>
+
+    <span class="s2">//these values are for red side carousel</span>
+    <span class="s0">int </span><span class="s1">subMatWidth = </span><span class="s3">30</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">subMatHeight = </span><span class="s3">40</span><span class="s0">;</span>
+
+    <span class="s2">//row, column (y, x)</span>
+    <span class="s0">int</span><span class="s1">[] subMatZeroAnchor = {</span><span class="s3">110</span><span class="s0">,</span><span class="s3">110</span><span class="s1">}</span><span class="s0">;</span>
+    <span class="s0">int</span><span class="s1">[] subMatOneAnchor = {</span><span class="s3">110</span><span class="s0">,</span><span class="s3">355</span><span class="s1">}</span><span class="s0">;</span>
+    <span class="s0">int</span><span class="s1">[] subMatTwoAnchor = {</span><span class="s3">110</span><span class="s0">,</span><span class="s3">600</span><span class="s1">}</span><span class="s0">;</span>
+
+    <span class="s0">public </span><span class="s1">FreightFrenzyPipeline(</span><span class="s0">int </span><span class="s1">width</span><span class="s0">, int </span><span class="s1">height</span><span class="s0">, int</span><span class="s1">[] anchorZero</span><span class="s0">, int</span><span class="s1">[] anchorOne</span><span class="s0">, int</span><span class="s1">[] anchorTwo){</span>
+        <span class="s2">//constructor</span>
+        <span class="s1">subMatWidth = width</span><span class="s0">;</span>
+        <span class="s1">subMatHeight = height</span><span class="s0">;</span>
+
+        <span class="s1">subMatZeroAnchor = anchorZero</span><span class="s0">;</span>
+        <span class="s1">subMatOneAnchor = anchorOne</span><span class="s0">;</span>
+        <span class="s1">subMatTwoAnchor = anchorTwo</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public </span><span class="s1">Mat processFrame(Mat input) {</span>
+        <span class="s1">input.copyTo(YCrCb)</span><span class="s0">;</span>
+
+        <span class="s0">if</span><span class="s1">(YCrCb.empty()){</span>
+            <span class="s0">return </span><span class="s1">input</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">Imgproc.cvtColor(YCrCb</span><span class="s0">, </span><span class="s1">YCrCb</span><span class="s0">, </span><span class="s1">Imgproc.COLOR_RGB2YCrCb)</span><span class="s0">;</span>
+
+        <span class="s2">//make these positions based on variables based on where auto is starting</span>
+        <span class="s1">Mat matLeft = YCrCb.submat(subMatZeroAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatZeroAnchor[</span><span class="s3">0</span><span class="s1">] + subMatHeight</span><span class="s0">,</span><span class="s1">subMatZeroAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatZeroAnchor[</span><span class="s3">1</span><span class="s1">] + subMatWidth)</span><span class="s0">;</span>
+        <span class="s1">Mat matCenter = YCrCb.submat(subMatOneAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatOneAnchor[</span><span class="s3">0</span><span class="s1">] + subMatHeight</span><span class="s0">,</span><span class="s1">subMatOneAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatOneAnchor[</span><span class="s3">1</span><span class="s1">] + subMatWidth)</span><span class="s0">;</span>
+        <span class="s1">Mat matRight = YCrCb.submat(subMatTwoAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatTwoAnchor[</span><span class="s3">0</span><span class="s1">] + subMatHeight</span><span class="s0">,</span><span class="s1">subMatTwoAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatTwoAnchor[</span><span class="s3">1</span><span class="s1">] + subMatWidth)</span><span class="s0">;</span>
+
+        <span class="s1">Imgproc.rectangle(YCrCb</span><span class="s0">, new </span><span class="s1">Rect(subMatZeroAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatZeroAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatWidth</span><span class="s0">, </span><span class="s1">subMatHeight)</span><span class="s0">, new </span><span class="s1">Scalar(</span><span class="s3">0</span><span class="s0">,</span><span class="s3">255</span><span class="s0">,</span><span class="s3">0</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">Imgproc.rectangle(YCrCb</span><span class="s0">, new </span><span class="s1">Rect(subMatOneAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatOneAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatWidth</span><span class="s0">, </span><span class="s1">subMatHeight)</span><span class="s0">, new </span><span class="s1">Scalar(</span><span class="s3">0</span><span class="s0">,</span><span class="s3">255</span><span class="s0">,</span><span class="s3">0</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">Imgproc.rectangle(YCrCb</span><span class="s0">, new </span><span class="s1">Rect(subMatTwoAnchor[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatTwoAnchor[</span><span class="s3">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">subMatWidth</span><span class="s0">, </span><span class="s1">subMatHeight)</span><span class="s0">, new </span><span class="s1">Scalar(</span><span class="s3">0</span><span class="s0">,</span><span class="s3">255</span><span class="s0">,</span><span class="s3">0</span><span class="s1">))</span><span class="s0">;</span>
+
+        <span class="s2">//val[1] to get first value in YCrCb, which is Cr value</span>
+        <span class="s0">double </span><span class="s1">leftTotal = Core.sumElems(matLeft).val[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">centerTotal = Core.sumElems(matCenter).val[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s0">double </span><span class="s1">rightTotal = Core.sumElems(matRight).val[</span><span class="s3">1</span><span class="s1">]</span><span class="s0">;</span>
+
+        <span class="s0">if</span><span class="s1">(leftTotal &gt; centerTotal &amp; leftTotal &gt; rightTotal){</span>
+            <span class="s2">//marker is on the left</span>
+            <span class="s1">position = </span><span class="s3">0</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if</span><span class="s1">(centerTotal &gt; leftTotal &amp; centerTotal &gt; rightTotal){</span>
+            <span class="s2">//marker is on the center</span>
+            <span class="s1">position = </span><span class="s3">1</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if</span><span class="s1">(rightTotal &gt; leftTotal &amp; rightTotal &gt; centerTotal){</span>
+            <span class="s2">//marker is on the right</span>
+            <span class="s1">position = </span><span class="s3">2</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">YCrCb.release()</span><span class="s0">; </span><span class="s2">//don't leak memory?</span>
+        <span class="s1">matLeft.release()</span><span class="s0">;</span>
+        <span class="s1">matCenter.release()</span><span class="s0">;</span>
+        <span class="s1">matRight.release()</span><span class="s0">;</span>
+
+        <span class="s0">return </span><span class="s1">input</span><span class="s0">;</span>
+        <span class="s2">//return YCrCb;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

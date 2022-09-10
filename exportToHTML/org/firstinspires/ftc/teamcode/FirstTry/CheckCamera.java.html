@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>CheckCamera.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #808080;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CheckCamera.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCamera</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCameraFactory</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCameraRotation</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvWebcam</span><span class="s0">;</span>
+
+<span class="s1">@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = </span><span class="s2">&quot;Check Camera&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">CheckCamera </span><span class="s0">extends </span><span class="s1">LinearOpMode {</span>
+    <span class="s3">//variables for camera operation</span>
+    <span class="s3">//row, column (y, x)</span>
+    <span class="s0">int</span><span class="s1">[] subMatZero = {</span><span class="s4">110</span><span class="s0">, </span><span class="s4">10</span><span class="s1">}</span><span class="s0">;</span>
+    <span class="s0">int</span><span class="s1">[] subMatOne = {</span><span class="s4">110</span><span class="s0">, </span><span class="s4">240</span><span class="s1">}</span><span class="s0">;</span>
+    <span class="s0">int</span><span class="s1">[] subMatTwo = {</span><span class="s4">110</span><span class="s0">, </span><span class="s4">470</span><span class="s1">}</span><span class="s0">;</span>
+
+    <span class="s0">int </span><span class="s1">subMatWidth = </span><span class="s4">30</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">subMatHeight = </span><span class="s4">40</span><span class="s0">;</span>
+
+    <span class="s0">static final int </span><span class="s1">STREAM_WIDTH = </span><span class="s4">640</span><span class="s0">; </span><span class="s3">// modify for your camera</span>
+    <span class="s0">static final int </span><span class="s1">STREAM_HEIGHT = </span><span class="s4">360</span><span class="s0">; </span><span class="s3">// modify for your camera</span>
+    <span class="s1">OpenCvWebcam webcam</span><span class="s0">;</span>
+    <span class="s1">FreightFrenzyPipeline pipeline</span><span class="s0">;</span>
+
+    <span class="s0">int </span><span class="s1">position = </span><span class="s4">0</span><span class="s0">;</span>
+    <span class="s3">//end of variables for camera</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode() </span><span class="s0">throws </span><span class="s1">InterruptedException {</span>
+
+        <span class="s3">//initialize camera</span>
+        <span class="s0">int </span><span class="s1">cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(</span><span class="s2">&quot;cameraMonitorViewId&quot;</span><span class="s0">, </span><span class="s2">&quot;id&quot;</span><span class="s0">, </span><span class="s1">hardwareMap.appContext.getPackageName())</span><span class="s0">;</span>
+        <span class="s1">WebcamName webcamName = </span><span class="s0">null;</span>
+        <span class="s1">webcamName = hardwareMap.get(WebcamName.</span><span class="s0">class, </span><span class="s2">&quot;webcam&quot;</span><span class="s1">)</span><span class="s0">; </span><span class="s3">// put your camera's name here</span>
+        <span class="s1">webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName</span><span class="s0">, </span><span class="s1">cameraMonitorViewId)</span><span class="s0">;</span>
+        <span class="s1">pipeline = </span><span class="s0">new </span><span class="s1">FreightFrenzyPipeline(subMatWidth</span><span class="s0">, </span><span class="s1">subMatHeight</span><span class="s0">, </span><span class="s1">subMatZero</span><span class="s0">, </span><span class="s1">subMatOne</span><span class="s0">, </span><span class="s1">subMatTwo)</span><span class="s0">;</span>
+        <span class="s1">webcam.setPipeline(pipeline)</span><span class="s0">;</span>
+        <span class="s1">webcam.openCameraDeviceAsync(</span><span class="s0">new </span><span class="s1">OpenCvCamera.AsyncCameraOpenListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onOpened() {</span>
+                <span class="s1">webcam.startStreaming(STREAM_WIDTH</span><span class="s0">, </span><span class="s1">STREAM_HEIGHT</span><span class="s0">, </span><span class="s1">OpenCvCameraRotation.UPRIGHT)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onError(</span><span class="s0">int </span><span class="s1">errorCode) {</span>
+                <span class="s1">telemetry.addData(</span><span class="s2">&quot;Camera Failed&quot;</span><span class="s0">, </span><span class="s2">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">telemetry.update()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">; </span><span class="s3">//done initializing camera</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Mode&quot;</span><span class="s0">, </span><span class="s2">&quot;calibrated&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s0">while </span><span class="s1">(!isStarted()) {</span>
+            <span class="s1">position = pipeline.position</span><span class="s0">;</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;Position&quot;</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span>
+            <span class="s1">telemetry.update()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s3">//no more need for camera beyond this point</span>
+        <span class="s1">webcam.stopStreaming()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

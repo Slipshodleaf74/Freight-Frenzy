@@ -1,0 +1,447 @@
+<html>
+<head>
+<title>LucasHardwareBOX.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #629755; font-style: italic;}
+.s4 { color: #6897bb;}
+.s5 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+LucasHardwareBOX.java</font>
+</center></td></tr></table>
+<pre><span class="s0">/* Copyright (c) 2017 FIRST. All rights reserved. 
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted (subject to the limitations in the disclaimer below) provided that 
+ * the following conditions are met: 
+ * 
+ * Redistributions of source code must retain the above copyright notice, this list 
+ * of conditions and the following disclaimer. 
+ * 
+ * Redistributions in binary form must reproduce the above copyright notice, this 
+ * list of conditions and the following disclaimer in the documentation and/or 
+ * other materials provided with the distribution. 
+ * 
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or 
+ * promote products derived from this software without specific prior written permission. 
+ * 
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ */</span>
+
+<span class="s2">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">androidx.core.math.MathUtils</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">com.qualcomm.hardware.bosch.BNO055IMU</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.CRServo</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotorEx</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.HardwareMap</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.Servo</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AngleUnit</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AxesOrder</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AxesReference</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.Orientation</span><span class="s2">;</span>
+
+
+<span class="s3">/**</span>
+ <span class="s3">* This is NOT an opmode.</span>
+ <span class="s3">*</span>
+ <span class="s3">* This class can be used to define all the specific hardware for a single robot.</span>
+ <span class="s3">* In this case that robot is a Pushbot.</span>
+ <span class="s3">* See PushbotTeleopTank_Iterative and others classes starting with &quot;Pushbot&quot; for usage examples.</span>
+ <span class="s3">*</span>
+ <span class="s3">* This hardware class assumes the following device names have been configured on the robot:</span>
+ <span class="s3">* Note:  All names are lower case and some have single spaces between words.</span>
+ <span class="s3">*</span>
+ <span class="s3">* Motor channel:  Front Left  drive motor:        &quot;FrontLeft&quot;</span>
+ <span class="s3">* Motor channel:  Front Right drive motor:        &quot;FrontRight&quot;</span>
+ <span class="s3">* Motor channel:  Back Left drive motor:          &quot;BackLeft&quot;</span>
+ <span class="s3">* Motor channel:  Back Right drive motor:         &quot;BackRight&quot;</span>
+ <span class="s3">* Motor channel:  Arm motor:                      &quot;Arm&quot;</span>
+ <span class="s3">* Motor channel:  Carousel spinner motor:         &quot;Carousel&quot;</span>
+ <span class="s3">* Servo channel:  Grabber servo:                  &quot;Grab&quot;</span>
+ <span class="s3">*/</span>
+
+<span class="s0">// Based on HardwarePushbot</span>
+<span class="s2">public class </span><span class="s1">LucasHardwareBOX {</span>
+
+    <span class="s0">/* public op mode members */</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx frontLeft = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx frontRight = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx backLeft = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx backRight = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx arm = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx carousel = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx extender = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx intake = </span><span class="s2">null;</span>
+
+    <span class="s1">CRServo intake1 = </span><span class="s2">null;</span>
+    <span class="s1">CRServo intake2 = </span><span class="s2">null;</span>
+
+    <span class="s2">public </span><span class="s1">Servo wrist = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">Servo flipper = </span><span class="s2">null;</span>
+
+    <span class="s1">BNO055IMU               imu</span><span class="s2">;</span>
+    <span class="s1">Orientation             lastAngles = </span><span class="s2">new </span><span class="s1">Orientation()</span><span class="s2">;</span>
+    <span class="s2">double                  </span><span class="s1">globalAngle</span><span class="s2">;</span>
+
+    <span class="s0">/* local OpMode members. */</span>
+    <span class="s1">HardwareMap hwMap           =  </span><span class="s2">null;</span>
+    <span class="s2">private </span><span class="s1">ElapsedTime period  = </span><span class="s2">new </span><span class="s1">ElapsedTime()</span><span class="s2">;</span>
+
+    <span class="s0">//for arm/wrist/extender maintenance</span>
+    <span class="s2">private int </span><span class="s1">deltaArm = </span><span class="s4">0</span><span class="s2">;</span>
+
+    <span class="s2">private double </span><span class="s1">extendMax = -</span><span class="s4">1400</span><span class="s2">;</span>
+
+    <span class="s2">private double </span><span class="s1">armZeroAnglePosition = </span><span class="s4">800</span><span class="s2">;</span>
+    <span class="s2">private double </span><span class="s1">armClicksPerHalfRevolution = </span><span class="s4">1850</span><span class="s2">;</span>
+
+    <span class="s2">private double </span><span class="s1">wristZeroAnglePosition = </span><span class="s4">0.567</span><span class="s2">;</span>
+    <span class="s2">private double </span><span class="s1">wristClicksPerHalfRevolution = </span><span class="s4">0.9 </span><span class="s1">- </span><span class="s4">0.225</span><span class="s2">;</span>
+
+    <span class="s2">private double </span><span class="s1">safeWrist = </span><span class="s4">1.0</span><span class="s2">;</span>
+    <span class="s2">private double </span><span class="s1">intakeWrist = </span><span class="s4">.79</span><span class="s2">;</span>
+
+    <span class="s0">/* Constructor */</span>
+    <span class="s2">public </span><span class="s1">LucasHardwareBOX(){</span>
+    <span class="s1">}</span>
+
+    <span class="s0">/* Initialize standard Hardware interfaces */</span>
+    <span class="s2">public void </span><span class="s1">init(HardwareMap ahwMap){</span>
+        <span class="s0">// Save reference to Hardware map</span>
+        <span class="s1">hwMap = ahwMap</span><span class="s2">;</span>
+
+        <span class="s0">// Define and initialize motor and servo</span>
+        <span class="s1">frontLeft = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;FrontLeft&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;BackLeft&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;FrontRight&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;BackRight&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">arm = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;Arm&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">carousel = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;Carousel&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">extender = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;Extender&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">intake = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s5">&quot;Intake&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s1">intake1 = hwMap.get(CRServo.</span><span class="s2">class, </span><span class="s5">&quot;Intake1&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">intake2 = hwMap.get(CRServo.</span><span class="s2">class, </span><span class="s5">&quot;Intake2&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s1">wrist = hwMap.get(Servo.</span><span class="s2">class, </span><span class="s5">&quot;Wrist&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">flipper = hwMap.get(Servo.</span><span class="s2">class, </span><span class="s5">&quot;Flipper&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s0">// Set motor and servo directions based on orientation of motors on robot</span>
+        <span class="s1">frontLeft.setDirection(DcMotor.Direction.FORWARD)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setDirection(DcMotor.Direction.FORWARD)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+        <span class="s1">backRight.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+        <span class="s1">carousel.setDirection(DcMotor.Direction.FORWARD)</span><span class="s2">;</span>
+        <span class="s1">arm.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+        <span class="s1">extender.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+
+
+        <span class="s0">// Set all motors to zero power</span>
+        <span class="s1">frontLeft.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">arm.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">carousel.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">extender.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">intake.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s0">// Run motors without encoders, arm uses encoder, intake doesn't</span>
+        <span class="s1">arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">extender.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)</span><span class="s2">;</span>
+
+        <span class="s1">frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">extender.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+
+        <span class="s0">// Set target positions first so that error doesn't occur</span>
+        <span class="s1">frontRight.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontLeft.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">arm.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">extender.setTargetPosition(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s0">// set arm to brake when power is zero</span>
+        <span class="s1">arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE)</span><span class="s2">;</span>
+
+        <span class="s1">BNO055IMU.Parameters parameters = </span><span class="s2">new </span><span class="s1">BNO055IMU.Parameters()</span><span class="s2">;</span>
+
+        <span class="s1">parameters.mode                = BNO055IMU.SensorMode.IMU</span><span class="s2">;</span>
+        <span class="s1">parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES</span><span class="s2">;</span>
+        <span class="s1">parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC</span><span class="s2">;</span>
+        <span class="s1">parameters.loggingEnabled      = </span><span class="s2">false;</span>
+
+        <span class="s0">// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port</span>
+        <span class="s0">// on a Core Device Interface Module, configured to be a sensor of type &quot;AdaFruit IMU&quot;,</span>
+        <span class="s0">// and named &quot;imu&quot;.</span>
+        <span class="s1">imu = hwMap.get(BNO055IMU.</span><span class="s2">class, </span><span class="s5">&quot;imu&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s1">imu.initialize(parameters)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">//manual arm control</span>
+    <span class="s2">public void </span><span class="s1">moveArm(</span><span class="s2">double </span><span class="s1">power){</span>
+        <span class="s2">if</span><span class="s1">(arm.getMode() != DcMotor.RunMode.RUN_USING_ENCODER){</span>
+            <span class="s1">arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s1">arm.setPower(power)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">moveExtender(</span><span class="s2">double </span><span class="s1">power){</span>
+        <span class="s1">extender.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">extender.setPower(power)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s0">//experimental function to set power of arm to maintain its position</span>
+    <span class="s2">public void </span><span class="s1">maintainArm(){</span>
+        <span class="s0">//function to change power relative to angle of arm, at positions 400 and 2350 needs to be the highest magnitude (horizontal)</span>
+        <span class="s2">double </span><span class="s1">angleMultiplier = Math.cos((((</span><span class="s2">double</span><span class="s1">)arm.getCurrentPosition() - armZeroAnglePosition)/armClicksPerHalfRevolution) * Math.PI)</span><span class="s2">;</span>
+        <span class="s0">//function to change power relative to length of extension, min at 0 and max at -1400</span>
+        <span class="s2">double </span><span class="s1">lengthMultiplier = (Math.abs((</span><span class="s2">double</span><span class="s1">)extender.getCurrentPosition()) / extendMax) + </span><span class="s4">1.0</span><span class="s2">;</span>
+
+        <span class="s2">double </span><span class="s1">coefficient = </span><span class="s4">0.05</span><span class="s2">;</span>
+
+        <span class="s1">arm.setPower(lengthMultiplier * angleMultiplier * coefficient)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">//automatic arm control</span>
+    <span class="s0">//switch arm to run to position, run to level selected, switch back</span>
+    <span class="s2">public void </span><span class="s1">encoderExtend(</span><span class="s2">int </span><span class="s1">pos</span><span class="s2">, double </span><span class="s1">power</span><span class="s2">, boolean </span><span class="s1">wait){</span>
+        <span class="s1">extender.setMode(DcMotor.RunMode.RUN_TO_POSITION)</span><span class="s2">;</span>
+        <span class="s1">extender.setTargetPosition(pos)</span><span class="s2">;</span>
+        <span class="s1">extender.setPower(power)</span><span class="s2">;</span>
+
+        <span class="s2">while</span><span class="s1">(Math.abs(extender.getCurrentPosition() - extender.getTargetPosition()) &gt; </span><span class="s4">10 </span><span class="s1">&amp;&amp; wait){</span>
+            <span class="s0">//lol</span>
+        <span class="s1">}</span>
+
+        <span class="s2">if </span><span class="s1">(wait){</span>
+            <span class="s1">extender.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">encoderMoveArm(</span><span class="s2">int </span><span class="s1">pos</span><span class="s2">, double </span><span class="s1">power){</span>
+        <span class="s2">if</span><span class="s1">(arm.getMode() != DcMotor.RunMode.RUN_TO_POSITION){</span>
+            <span class="s1">arm.setMode(DcMotor.RunMode.RUN_TO_POSITION)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s2">int </span><span class="s1">target = pos</span><span class="s2">;</span>
+
+        <span class="s1">arm.setTargetPosition(target)</span><span class="s2">;</span>
+
+        <span class="s0">//maintain arm if distance to target position gets too big</span>
+        <span class="s1">deltaArm = Math.abs(arm.getCurrentPosition() - target)</span><span class="s2">;</span>
+
+        <span class="s2">if</span><span class="s1">(deltaArm &lt;= </span><span class="s4">10</span><span class="s1">){</span>
+            <span class="s1">arm.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else if</span><span class="s1">(deltaArm &lt;= </span><span class="s4">20</span><span class="s1">){</span>
+            <span class="s1">arm.setPower(power * </span><span class="s4">0.05</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else if</span><span class="s1">(deltaArm &lt;= </span><span class="s4">40</span><span class="s1">){</span>
+            <span class="s1">arm.setPower(power * </span><span class="s4">0.1</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else if</span><span class="s1">(deltaArm &lt;= </span><span class="s4">200</span><span class="s1">){</span>
+            <span class="s1">arm.setPower(power * </span><span class="s4">0.15</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else</span><span class="s1">{</span>
+            <span class="s1">arm.setPower(power)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">//driving</span>
+    <span class="s2">public void </span><span class="s1">setDriveSpeeds(</span><span class="s2">double </span><span class="s1">forwardleft</span><span class="s2">, double </span><span class="s1">forwardright</span><span class="s2">, double </span><span class="s1">strafeleft</span><span class="s2">, double </span><span class="s1">straferight</span><span class="s2">, double </span><span class="s1">correction) {</span>
+
+        <span class="s2">double </span><span class="s1">frontLeftSpeed = forwardleft + strafeleft - correction</span><span class="s2">; </span><span class="s0">//-correction</span>
+        <span class="s2">double </span><span class="s1">frontRightSpeed = forwardright - straferight + correction</span><span class="s2">; </span><span class="s0">//+correction</span>
+        <span class="s2">double </span><span class="s1">backLeftSpeed = forwardleft - strafeleft - correction</span><span class="s2">; </span><span class="s0">//-correction</span>
+        <span class="s2">double </span><span class="s1">backRightSpeed = forwardright + straferight + correction</span><span class="s2">; </span><span class="s0">//+correction</span>
+
+        <span class="s2">double </span><span class="s1">largest = </span><span class="s4">1.0</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(frontLeftSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(frontRightSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(backLeftSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(backRightSpeed))</span><span class="s2">;</span>
+
+        <span class="s1">frontLeft.setPower(frontLeftSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(frontRightSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(backLeftSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(backRightSpeed / largest)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">//rotation group of functions</span>
+    <span class="s2">public double </span><span class="s1">getAngle() {</span>
+        <span class="s0">// We experimentally determined the Z axis is the axis we want to use for heading angle.</span>
+        <span class="s0">// We have to process the angle because the imu works in euler angles so the Z axis is</span>
+        <span class="s0">// returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes</span>
+        <span class="s0">// 180 degrees. We detect this transition and track the total cumulative angle of rotation.</span>
+
+        <span class="s1">Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC</span><span class="s2">, </span><span class="s1">AxesOrder.ZYX</span><span class="s2">, </span><span class="s1">AngleUnit.DEGREES)</span><span class="s2">;</span>
+
+        <span class="s2">double </span><span class="s1">deltaAngle = angles.firstAngle - lastAngles.firstAngle</span><span class="s2">;</span>
+
+        <span class="s2">if </span><span class="s1">(deltaAngle &lt; -</span><span class="s4">180</span><span class="s1">)</span>
+            <span class="s1">deltaAngle += </span><span class="s4">360</span><span class="s2">;</span>
+        <span class="s2">else if </span><span class="s1">(deltaAngle &gt; </span><span class="s4">180</span><span class="s1">)</span>
+            <span class="s1">deltaAngle -= </span><span class="s4">360</span><span class="s2">;</span>
+
+        <span class="s1">globalAngle += deltaAngle</span><span class="s2">;</span>
+
+        <span class="s1">lastAngles = angles</span><span class="s2">;</span>
+
+        <span class="s2">return </span><span class="s1">globalAngle</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">private void </span><span class="s1">resetAngle() {</span>
+        <span class="s1">lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC</span><span class="s2">, </span><span class="s1">AxesOrder.ZYX</span><span class="s2">, </span><span class="s1">AngleUnit.DEGREES)</span><span class="s2">;</span>
+
+        <span class="s1">globalAngle = </span><span class="s4">0</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s0">//negative left turn</span>
+    <span class="s0">//positive right turn</span>
+    <span class="s2">public void </span><span class="s1">rotate(</span><span class="s2">int </span><span class="s1">degrees</span><span class="s2">, double </span><span class="s1">power</span><span class="s2">, </span><span class="s1">LinearOpMode instance) {</span>
+        <span class="s2">double  </span><span class="s1">leftPower</span><span class="s2">, </span><span class="s1">rightPower</span><span class="s2">;</span>
+
+        <span class="s1">degrees *= -</span><span class="s4">1</span><span class="s2">;</span>
+
+        <span class="s1">power = Math.min(</span><span class="s4">0.7</span><span class="s2">, </span><span class="s1">power)</span><span class="s2">;</span>
+
+        <span class="s0">//degrees *= -1;</span>
+
+        <span class="s0">// restart imu movement tracking.</span>
+        <span class="s1">resetAngle()</span><span class="s2">;</span>
+
+        <span class="s0">// getAngle() returns + when rotating counter clockwise (left) and - when rotating clockwise (right).</span>
+
+        <span class="s2">if </span><span class="s1">(degrees &lt; </span><span class="s4">0</span><span class="s1">)</span>
+        <span class="s1">{   </span><span class="s0">// turn right.</span>
+            <span class="s1">leftPower = power</span><span class="s2">;</span>
+            <span class="s1">rightPower = -power</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else if </span><span class="s1">(degrees &gt; </span><span class="s4">0</span><span class="s1">)</span>
+        <span class="s1">{   </span><span class="s0">// turn left.</span>
+            <span class="s1">leftPower = -power</span><span class="s2">;</span>
+            <span class="s1">rightPower = power</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else return;</span>
+
+        <span class="s0">// set power to rotate. FOR PIVOT, ONLY POWER FRONT MOTORS</span>
+        <span class="s0">//frontLeft.setPower(-leftPower);</span>
+        <span class="s0">//frontRight.setPower(-rightPower);</span>
+        <span class="s1">backLeft.setPower(-leftPower)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(-rightPower)</span><span class="s2">;</span>
+
+        <span class="s0">// rotate until turn is completed.</span>
+        <span class="s0">/* 
+        if (degrees &lt; 0) 
+        { 
+            // On right turn we have to get off zero first. 
+            //^ why? 
+            //while (instance.opModeIsActive() &amp;&amp; getAngle() == 0) {} 
+ 
+            while (instance.opModeIsActive() &amp;&amp; getAngle() &gt; degrees) {} 
+        } 
+        else    // left turn. 
+            while (instance.opModeIsActive() &amp;&amp; getAngle() &lt; degrees) {} 
+ 
+         */</span>
+
+        <span class="s0">//frontLeft.setPower(-leftPower);</span>
+        <span class="s0">//frontRight.setPower(-rightPower);</span>
+
+    <span class="s1">}</span>
+
+    <span class="s0">//misc functions, wrist, spin, stop</span>
+    <span class="s2">public void </span><span class="s1">moveWrist(</span><span class="s2">boolean </span><span class="s1">dir){</span>
+        <span class="s0">//rate of wrist movement</span>
+        <span class="s2">double </span><span class="s1">posChange = </span><span class="s4">0.002</span><span class="s2">;</span>
+
+        <span class="s2">if</span><span class="s1">(!dir){</span>
+            <span class="s1">posChange *= -</span><span class="s4">1.0</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">//change wrist position</span>
+        <span class="s1">wrist.setPosition(MathUtils.clamp(wrist.getPosition() + posChange</span><span class="s2">,</span><span class="s4">0.0</span><span class="s2">,</span><span class="s4">1.0</span><span class="s1">))</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">levelWrist(){</span>
+        <span class="s2">double </span><span class="s1">armRad = </span><span class="s4">0.0</span><span class="s2">;</span>
+        <span class="s2">double </span><span class="s1">wristRad = </span><span class="s4">0.0</span><span class="s2">;</span>
+        <span class="s0">//turn arm encoder position into arm angle</span>
+        <span class="s1">armRad = (((</span><span class="s2">double</span><span class="s1">)arm.getCurrentPosition() - armZeroAnglePosition) * Math.PI) / armClicksPerHalfRevolution</span><span class="s2">;</span>
+
+        <span class="s2">if</span><span class="s1">(armRad &lt;= Math.PI/</span><span class="s4">2.0</span><span class="s1">){</span>
+            <span class="s1">wristRad = -armRad</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else</span><span class="s1">{</span>
+            <span class="s1">wristRad = -armRad + Math.PI</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">//turn wrist angle into wrist position and set wrist to said position</span>
+        <span class="s1">wrist.setPosition(((wristRad * wristClicksPerHalfRevolution) / Math.PI) + wristZeroAnglePosition)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">saveWrist(){</span>
+        <span class="s1">wrist.setPosition(safeWrist)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">intakeWrist(){</span>
+        <span class="s1">wrist.setPosition(intakeWrist)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">spin(</span><span class="s2">double </span><span class="s1">power</span><span class="s2">, boolean </span><span class="s1">direction){</span>
+        <span class="s2">if</span><span class="s1">(direction){</span>
+            <span class="s1">carousel.setPower(power)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else</span><span class="s1">{</span>
+            <span class="s1">carousel.setPower(-power)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s2">public void </span><span class="s1">stop() {</span>
+        <span class="s0">// Set all motors to 0 power</span>
+        <span class="s1">frontLeft.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(</span><span class="s4">0</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">intake(</span><span class="s2">boolean </span><span class="s1">on</span><span class="s2">, boolean </span><span class="s1">dir){</span>
+        <span class="s0">//set motor to spin</span>
+        <span class="s2">if</span><span class="s1">(dir &amp;&amp; on){</span>
+            <span class="s1">intake1.setPower(</span><span class="s4">1.0</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">intake2.setPower(-</span><span class="s4">1.0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else if </span><span class="s1">(on){</span>
+            <span class="s1">intake1.setPower(-</span><span class="s4">1.0</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">intake2.setPower(</span><span class="s4">1.0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else</span><span class="s1">{</span>
+            <span class="s1">intake1.setPower(</span><span class="s4">0.0</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">intake2.setPower(</span><span class="s4">0.0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

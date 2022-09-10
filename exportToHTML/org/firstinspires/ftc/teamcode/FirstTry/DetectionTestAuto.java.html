@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>DetectionTestAuto.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DetectionTestAuto.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.Autonomous</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCamera</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCameraFactory</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvCameraRotation</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">org.openftc.easyopencv.OpenCvInternalCamera</span><span class="s0">;</span>
+
+<span class="s1">@Autonomous(name = </span><span class="s2">&quot;Detection Test Auto&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">DetectionTestAuto </span><span class="s0">extends </span><span class="s1">LinearOpMode {</span>
+    <span class="s1">AutoHardware robot = </span><span class="s0">new </span><span class="s1">AutoHardware()</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">OpenCvCamera webcam</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">MarkerDetector detector</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">MarkerDetector.CappingPosition position</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode(){</span>
+        <span class="s1">robot.init(hardwareMap)</span><span class="s0">;</span>
+
+        <span class="s0">int </span><span class="s1">cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(</span><span class="s2">&quot;Webcam&quot;</span><span class="s0">, </span><span class="s2">&quot;id&quot;</span><span class="s0">, </span><span class="s1">hardwareMap.appContext.getPackageName())</span><span class="s0">;</span>
+        <span class="s1">webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK</span><span class="s0">, </span><span class="s1">cameraMonitorViewId)</span><span class="s0">;</span>
+        <span class="s1">webcam.openCameraDevice()</span><span class="s0">;</span>
+        <span class="s1">webcam.setPipeline(detector)</span><span class="s0">;</span>
+        <span class="s1">webcam.startStreaming(</span><span class="s3">640</span><span class="s0">, </span><span class="s3">320</span><span class="s0">, </span><span class="s1">OpenCvCameraRotation.UPRIGHT)</span><span class="s0">;</span>
+        <span class="s1">position = detector.position</span><span class="s0">;</span>
+
+        <span class="s1">waitForStart()</span><span class="s0">;</span>
+
+        <span class="s1">position = detector.position</span><span class="s0">;</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;position&quot;</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s4">//add actual code here</span>
+        <span class="s0">if </span><span class="s1">(position.equals(</span><span class="s2">&quot;LEFT&quot;</span><span class="s1">)) {</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;The robot is doing left stuff &quot;</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(position.equals(</span><span class="s2">&quot;CENTER&quot;</span><span class="s1">)) {</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;The robot is doing center stuff &quot;</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(position.equals(</span><span class="s2">&quot;RIGHT&quot;</span><span class="s1">)) {</span>
+            <span class="s1">telemetry.addData(</span><span class="s2">&quot;The robot is doing right stuff &quot;</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

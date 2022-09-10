@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>LucasAuto.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #808080;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+LucasAuto.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s0">;</span>
+
+<span class="s1">@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = </span><span class="s2">&quot;built different auto&quot;</span><span class="s1">)</span>
+
+<span class="s3">//test for red carousel side</span>
+<span class="s0">public class </span><span class="s1">LucasAuto </span><span class="s0">extends </span><span class="s1">LinearOpMode{</span>
+    <span class="s1">AutoHardware robot = </span><span class="s0">new </span><span class="s1">AutoHardware()</span><span class="s0">;</span>
+
+    <span class="s0">double </span><span class="s1">driveSpeed = </span><span class="s4">0.6</span><span class="s0">;    double </span><span class="s1">strafeSpeed = </span><span class="s4">0.5</span><span class="s0">;</span>
+    <span class="s0">double </span><span class="s1">rotateSpeed = </span><span class="s4">0.3</span><span class="s0">;</span>
+    <span class="s0">double </span><span class="s1">armSpeed = </span><span class="s4">0.3</span><span class="s0">;</span>
+    <span class="s0">double </span><span class="s1">carouselSpeed = </span><span class="s4">0.5</span><span class="s0">;</span>
+    <span class="s0">double </span><span class="s1">extendSpeed = </span><span class="s4">0.8</span><span class="s0">;</span>
+    <span class="s0">double </span><span class="s1">grabPos = </span><span class="s4">0.8</span><span class="s0">;</span>
+
+    <span class="s0">public void </span><span class="s1">telemetry(){</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;wheel position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.frontRight.getCurrentPosition()))</span><span class="s0">;</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;arm position:&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.arm.getCurrentPosition()))</span><span class="s0">;</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;extender position&quot;</span><span class="s0">, </span><span class="s1">Integer.toString(robot.extender.getCurrentPosition()))</span><span class="s0">;</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;angle:&quot;</span><span class="s0">, </span><span class="s1">Double.toString(robot.getAngle()))</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode() </span><span class="s0">throws </span><span class="s1">InterruptedException {</span>
+        <span class="s1">robot.init(hardwareMap)</span><span class="s0">;</span>
+
+
+        <span class="s3">//reset grabber</span>
+        <span class="s1">robot.grab(grabPos)</span><span class="s0">;</span>
+
+        <span class="s3">//telemetry communication</span>
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Status&quot;</span><span class="s0">, </span><span class="s2">&quot;Initialized&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Mode&quot;</span><span class="s0">, </span><span class="s2">&quot;calibrating...&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s3">// make sure the imu gyro is calibrated before continuing.</span>
+        <span class="s0">while </span><span class="s1">(!isStopRequested() &amp;&amp; !robot.imu.isGyroCalibrated())</span>
+        <span class="s1">{</span>
+            <span class="s1">sleep(</span><span class="s4">50</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">idle()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)</span><span class="s0">;</span>
+        <span class="s1">robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Mode&quot;</span><span class="s0">, </span><span class="s2">&quot;calibrated&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s1">waitForStart()</span><span class="s0">;</span>
+
+
+        <span class="s3">//movements for auto</span>
+        <span class="s3">//strafe to right</span>
+        <span class="s1">robot.strafeToPosition(-</span><span class="s4">33</span><span class="s0">, </span><span class="s1">strafeSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//strafe into wall to align</span>
+        <span class="s1">robot.driveToPosition(-</span><span class="s4">3</span><span class="s0">,</span><span class="s1">driveSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//drive forward</span>
+        <span class="s1">robot.driveAndStop(</span><span class="s4">12</span><span class="s0">,</span><span class="s1">driveSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//rotate to place</span>
+        <span class="s1">robot.rotate(-</span><span class="s4">180</span><span class="s0">,</span><span class="s1">rotateSpeed</span><span class="s0">,this</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//move arm up</span>
+        <span class="s1">robot.moveArm(</span><span class="s4">3</span><span class="s0">,</span><span class="s1">armSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//extend arm</span>
+        <span class="s1">robot.moveExtender(</span><span class="s4">3</span><span class="s0">,</span><span class="s1">extendSpeed)</span><span class="s0">;</span>
+
+        <span class="s3">//release</span>
+        <span class="s1">robot.grab(</span><span class="s4">0</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">200</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">robot.grab(grabPos)</span><span class="s0">;</span>
+
+        <span class="s3">//retract arm</span>
+        <span class="s1">robot.moveExtender(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">extendSpeed)</span><span class="s0">;</span>
+
+        <span class="s3">//move arm back</span>
+        <span class="s1">robot.moveArm(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">armSpeed</span><span class="s0">, this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">200</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//strafe to wall</span>
+        <span class="s1">robot.strafeToPosition(-</span><span class="s4">60</span><span class="s0">, </span><span class="s1">strafeSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//drive up to carousel</span>
+        <span class="s1">robot.driveToPosition(</span><span class="s4">3</span><span class="s0">,</span><span class="s1">driveSpeed/</span><span class="s4">2</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//spin carousel</span>
+        <span class="s1">robot.spin(carouselSpeed</span><span class="s0">,false</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//wait</span>
+        <span class="s1">sleep(</span><span class="s4">2500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//stop spinning</span>
+        <span class="s1">robot.spin(</span><span class="s4">0</span><span class="s0">,true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//back up to depot</span>
+        <span class="s1">robot.driveAndStop(-</span><span class="s4">25</span><span class="s0">, </span><span class="s1">driveSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s4">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//strafe into wall to park</span>
+        <span class="s1">robot.strafeToPosition(-</span><span class="s4">3</span><span class="s0">, </span><span class="s1">strafeSpeed</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s3">//park</span>
+        <span class="s1">robot.stop()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>

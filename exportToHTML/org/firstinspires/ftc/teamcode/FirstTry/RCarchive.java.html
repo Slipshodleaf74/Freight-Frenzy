@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>RCarchive.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+RCarchive.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s0">;</span>
+
+<span class="s1">@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = </span><span class="s2">&quot;RC archive&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">RCarchive </span><span class="s0">extends </span><span class="s1">LinearOpMode{</span>
+    <span class="s1">AutoHardware robot = </span><span class="s0">new </span><span class="s1">AutoHardware()</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">runOpMode() </span><span class="s0">throws </span><span class="s1">InterruptedException {</span>
+        <span class="s1">robot.init(hardwareMap)</span><span class="s0">;</span>
+
+        <span class="s1">robot.grab(</span><span class="s3">1</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Status&quot;</span><span class="s0">, </span><span class="s2">&quot;Initialized&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Mode&quot;</span><span class="s0">, </span><span class="s2">&quot;calibrating...&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s4">// make sure the imu gyro is calibrated before continuing.</span>
+        <span class="s0">while </span><span class="s1">(!isStopRequested() &amp;&amp; !robot.imu.isGyroCalibrated())</span>
+        <span class="s1">{</span>
+            <span class="s1">sleep(</span><span class="s3">50</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">idle()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)</span><span class="s0">;</span>
+        <span class="s1">robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER)</span><span class="s0">;</span>
+
+        <span class="s1">telemetry.addData(</span><span class="s2">&quot;Mode&quot;</span><span class="s0">, </span><span class="s2">&quot;calibrated&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">telemetry.update()</span><span class="s0">;</span>
+
+        <span class="s1">waitForStart()</span><span class="s0">;</span>
+
+        <span class="s4">//movements for auto</span>
+        <span class="s4">//move forward</span>
+        <span class="s1">robot.driveAndStop(</span><span class="s3">28</span><span class="s0">, </span><span class="s3">.6</span><span class="s0">, this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">sleep(</span><span class="s3">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//rotate</span>
+        <span class="s1">robot.rotate(-</span><span class="s3">125</span><span class="s0">,</span><span class="s3">.5</span><span class="s0">,this</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//move arm up to level</span>
+        <span class="s1">robot.moveArm(</span><span class="s3">3</span><span class="s0">,</span><span class="s3">.2</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">sleep(</span><span class="s3">500</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//move forward?</span>
+        <span class="s4">//robot.driveAndStop(dontKnow, 1, this);</span>
+
+        <span class="s4">//release</span>
+        <span class="s1">robot.grab(</span><span class="s3">0</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">sleep(</span><span class="s3">1000</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//move back</span>
+        <span class="s4">//robot.driveAndStop(-dontKnow, 1, this);</span>
+
+        <span class="s4">//return arm</span>
+        <span class="s1">robot.moveArm(</span><span class="s3">4</span><span class="s0">,</span><span class="s3">.2</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//rotate to go to carousel</span>
+        <span class="s1">robot.rotate(-</span><span class="s3">10</span><span class="s0">,</span><span class="s3">.5</span><span class="s0">,this</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//drive to carousel</span>
+        <span class="s1">robot.driveAndStop(</span><span class="s3">35</span><span class="s0">, </span><span class="s3">.6</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s4">//slow down a lil</span>
+        <span class="s1">robot.driveToPosition(</span><span class="s3">4</span><span class="s0">,</span><span class="s3">.2</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//spin carousel</span>
+        <span class="s1">robot.spin(</span><span class="s3">.5</span><span class="s0">,false</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">sleep(</span><span class="s3">5000</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">robot.spin(</span><span class="s3">.0</span><span class="s0">,true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//strafe towards park</span>
+
+        <span class="s4">//rotate to park</span>
+        <span class="s1">robot.rotate(</span><span class="s3">35</span><span class="s0">,</span><span class="s3">.5</span><span class="s0">,this</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//strafe to park</span>
+        <span class="s1">robot.strafeToPosition(-</span><span class="s3">25</span><span class="s0">,</span><span class="s3">.4</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//move back</span>
+        <span class="s1">robot.driveAndStop(-</span><span class="s3">5</span><span class="s0">,</span><span class="s3">.4</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//return arm</span>
+        <span class="s1">robot.moveArm(</span><span class="s3">0</span><span class="s0">,</span><span class="s3">.2</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//drive into park</span>
+        <span class="s1">robot.driveAndStop(</span><span class="s3">5</span><span class="s0">,</span><span class="s3">.4</span><span class="s0">,this, true</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s4">//stop robot</span>
+        <span class="s1">robot.stop()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

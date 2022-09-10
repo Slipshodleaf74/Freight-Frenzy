@@ -1,0 +1,252 @@
+<html>
+<head>
+<title>AndrewHardware.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #629755; font-style: italic;}
+.s4 { color: #6a8759;}
+.s5 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AndrewHardware.java</font>
+</center></td></tr></table>
+<pre><span class="s0">/* Copyright (c) 2017 FIRST. All rights reserved. 
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted (subject to the limitations in the disclaimer below) provided that 
+ * the following conditions are met: 
+ * 
+ * Redistributions of source code must retain the above copyright notice, this list 
+ * of conditions and the following disclaimer. 
+ * 
+ * Redistributions in binary form must reproduce the above copyright notice, this 
+ * list of conditions and the following disclaimer in the documentation and/or 
+ * other materials provided with the distribution. 
+ * 
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or 
+ * promote products derived from this software without specific prior written permission. 
+ * 
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ * &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ */</span>
+
+<span class="s2">package </span><span class="s1">org.firstinspires.ftc.teamcode.FirstTry</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">com.qualcomm.hardware.bosch.BNO055IMU</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.Autonomous</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotorEx</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.HardwareMap</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.Servo</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AngleUnit</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AxesOrder</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.AxesReference</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.Orientation</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.hardware.ColorSensor</span><span class="s2">;</span>
+
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode</span><span class="s2">;</span>
+<span class="s2">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime</span><span class="s2">;</span>
+
+
+<span class="s3">/**</span>
+ <span class="s3">* This is NOT an opmode.</span>
+ <span class="s3">*</span>
+ <span class="s3">* This class can be used to define all the specific hardware for a single robot.</span>
+ <span class="s3">* In this case that robot is a Pushbot.</span>
+ <span class="s3">* See PushbotTeleopTank_Iterative and others classes starting with &quot;Pushbot&quot; for usage examples.</span>
+ <span class="s3">*</span>
+ <span class="s3">* This hardware class assumes the following device names have been configured on the robot:</span>
+ <span class="s3">* Note:  All names are lower case and some have single spaces between words.</span>
+ <span class="s3">*</span>
+ <span class="s3">* Motor channel:  Front Left  drive motor:        &quot;FrontLeft&quot;</span>
+ <span class="s3">* Motor channel:  Front Right drive motor:        &quot;FrontRight&quot;</span>
+ <span class="s3">* Motor channel:  Back Left drive motor:          &quot;BackLeft&quot;</span>
+ <span class="s3">* Motor channel:  Back Right drive motor:         &quot;BackRight&quot;</span>
+ <span class="s3">* Motor channel:  Arm motor:                      &quot;Arm&quot;</span>
+ <span class="s3">* Motor channel:  Carousel spinner motor:         &quot;Carousel&quot;</span>
+ <span class="s3">* Servo channel:  Grabber servo:                  &quot;Grab&quot;</span>
+ <span class="s3">*/</span>
+
+<span class="s0">// Based on HardwarePushbot</span>
+<span class="s2">public class </span><span class="s1">AndrewHardware {</span>
+
+    <span class="s0">/* public op mode members */</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx frontLeft = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx frontRight = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx backLeft = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx backRight = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx arm = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">DcMotorEx carousel = </span><span class="s2">null;</span>
+
+    <span class="s2">public </span><span class="s1">Servo grab1 = </span><span class="s2">null;</span>
+    <span class="s2">public </span><span class="s1">Servo grab2 = </span><span class="s2">null;</span>
+
+    <span class="s1">BNO055IMU               imu</span><span class="s2">;</span>
+    <span class="s1">Orientation             lastAngles = </span><span class="s2">new </span><span class="s1">Orientation()</span><span class="s2">;</span>
+    <span class="s2">double                  </span><span class="s1">globalAngle</span><span class="s2">;</span>
+
+    <span class="s0">/* local OpMode members. */</span>
+    <span class="s1">HardwareMap hwMap           =  </span><span class="s2">null;</span>
+    <span class="s2">private </span><span class="s1">ElapsedTime period  = </span><span class="s2">new </span><span class="s1">ElapsedTime()</span><span class="s2">;</span>
+
+    <span class="s0">/* change these if needed 
+    private double RADIUS = 0; 
+    private double CPR = 753.2; 
+    private double CIRC = 13.25; 
+    private double CALIBRATION = 1.1; 
+    */</span>
+
+    <span class="s0">/* Constructor */</span>
+    <span class="s2">public </span><span class="s1">AndrewHardware(){</span>
+    <span class="s1">}</span>
+
+    <span class="s0">/* Initialize standard Hardware interfaces */</span>
+    <span class="s2">public void </span><span class="s1">init(HardwareMap ahwMap){</span>
+        <span class="s0">// Save reference to Hardware map</span>
+        <span class="s1">hwMap = ahwMap</span><span class="s2">;</span>
+
+        <span class="s0">// Define and initialize motor and servo</span>
+        <span class="s1">frontLeft = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;FrontLeft&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;BackLeft&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;FrontRight&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;BackRight&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">arm = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;Arm&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">carousel = hwMap.get(DcMotorEx.</span><span class="s2">class, </span><span class="s4">&quot;Carousel&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">grab1 = hwMap.get(Servo.</span><span class="s2">class, </span><span class="s4">&quot;Grab1&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+
+        <span class="s0">// Set motor and servo directions based on orientation of motors on robot</span>
+        <span class="s1">frontLeft.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setDirection(DcMotor.Direction.REVERSE)</span><span class="s2">;</span>
+        <span class="s0">/* 
+        backLeft.setDirection(DcMotor.Direction.FORWARD); 
+        frontRight.setDirection(DcMotor.Direction.FORWARD); 
+        carousel.setDirection(DcMotor.Direction.FORWARD); 
+        arm.setDirection(DcMotor.Direction.FORWARD); 
+        */</span>
+
+        <span class="s0">// Set all motors to zero power</span>
+        <span class="s1">frontLeft.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">arm.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">carousel.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s0">// Run motors without encoders</span>
+        <span class="s1">frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+        <span class="s1">carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)</span><span class="s2">;</span>
+
+        <span class="s1">BNO055IMU.Parameters parameters = </span><span class="s2">new </span><span class="s1">BNO055IMU.Parameters()</span><span class="s2">;</span>
+
+        <span class="s1">parameters.mode                = BNO055IMU.SensorMode.IMU</span><span class="s2">;</span>
+        <span class="s1">parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES</span><span class="s2">;</span>
+        <span class="s1">parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC</span><span class="s2">;</span>
+        <span class="s1">parameters.loggingEnabled      = </span><span class="s2">false;</span>
+
+        <span class="s0">// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port</span>
+        <span class="s0">// on a Core Device Interface Module, configured to be a sensor of type &quot;AdaFruit IMU&quot;,</span>
+        <span class="s0">// and named &quot;imu&quot;.</span>
+        <span class="s1">imu = hwMap.get(BNO055IMU.</span><span class="s2">class, </span><span class="s4">&quot;imu&quot;</span><span class="s1">)</span><span class="s2">;</span>
+
+        <span class="s1">imu.initialize(parameters)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">/* functions */</span>
+    <span class="s0">/* functions needed: 
+        rotate to pos 
+        strafe to pos 
+        move to pos 
+        move * could include rotating and strafing 
+        get angle 
+        reset angle? *used in hardware 6417 don't know purpose might need 
+     */</span>
+    <span class="s2">public void </span><span class="s1">moveArm(</span><span class="s2">double </span><span class="s1">power){</span>
+        <span class="s1">arm.setPower(power)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">grab(</span><span class="s2">double </span><span class="s1">grabPos){</span>
+        <span class="s2">double </span><span class="s1">grabPos1 = </span><span class="s5">0</span><span class="s2">;</span>
+        <span class="s2">double </span><span class="s1">grabPos2 = </span><span class="s5">0</span><span class="s2">;</span>
+        <span class="s2">if </span><span class="s1">(grabPos &lt; </span><span class="s5">0.5</span><span class="s1">) {</span>
+            <span class="s0">//open</span>
+            <span class="s1">grabPos1 = </span><span class="s5">0.8</span><span class="s2">;</span>
+            <span class="s1">grabPos2 = </span><span class="s5">0.1</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else </span><span class="s1">{</span>
+            <span class="s0">//grabing</span>
+            <span class="s1">grabPos1 = </span><span class="s5">0.55</span><span class="s2">;</span>
+            <span class="s1">grabPos2 = </span><span class="s5">0.3</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">grab1.setPosition(grabPos1)</span><span class="s2">;</span>
+        <span class="s1">grab2.setPosition(grabPos2)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">spin(</span><span class="s2">double </span><span class="s1">power</span><span class="s2">, boolean </span><span class="s1">direction){</span>
+        <span class="s2">if</span><span class="s1">(direction){</span>
+            <span class="s1">carousel.setPower(power)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+        <span class="s2">else</span><span class="s1">{</span>
+            <span class="s1">carousel.setPower(-power)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">setDriveSpeeds(</span><span class="s2">double </span><span class="s1">forward</span><span class="s2">, double </span><span class="s1">strafe</span><span class="s2">, double </span><span class="s1">rotate</span><span class="s2">, double </span><span class="s1">correction) {</span>
+
+        <span class="s2">double </span><span class="s1">frontLeftSpeed = forward + strafe + rotate - correction</span><span class="s2">; </span><span class="s0">//-correction</span>
+        <span class="s2">double </span><span class="s1">frontRightSpeed = forward - strafe - rotate + correction</span><span class="s2">; </span><span class="s0">//+correction</span>
+        <span class="s2">double </span><span class="s1">backLeftSpeed = forward - strafe + rotate - correction</span><span class="s2">; </span><span class="s0">//-correction</span>
+        <span class="s2">double </span><span class="s1">backRightSpeed = forward + strafe - rotate + correction</span><span class="s2">; </span><span class="s0">//+correction</span>
+
+        <span class="s2">double </span><span class="s1">largest = </span><span class="s5">1.0</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(frontLeftSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(frontRightSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(backLeftSpeed))</span><span class="s2">;</span>
+        <span class="s1">largest = Math.max(largest</span><span class="s2">, </span><span class="s1">Math.abs(backRightSpeed))</span><span class="s2">;</span>
+
+        <span class="s1">frontLeft.setPower(frontLeftSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(frontRightSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(backLeftSpeed / largest)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(backRightSpeed / largest)</span><span class="s2">;</span>
+
+        <span class="s0">/* 
+        if(rotate!=0){ 
+            resetAngle(); 
+        } 
+        */</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">stop() {</span>
+        <span class="s0">// Set all motors to 0 power</span>
+        <span class="s1">frontLeft.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">frontRight.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backLeft.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">backRight.setPower(</span><span class="s5">0</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
